@@ -28,6 +28,10 @@
 
   <state id="waitForInteraction">
     <onentry>
+      <!-- <script>
+        qDebug() &lt;&lt; "!!! TEST: entering waitForInteraction";
+      </script> -->
+
       <send event="DialogComponent.waitForInteraction.Call">
       </send>
 
@@ -36,7 +40,7 @@
         qDebug() &lt;&lt; "entering waitForInteraction" &lt;&lt; topic;
       </script>
     </onentry>
-    <transition event="DialogComponentComponent.waitForInteraction.Return" target="waitForInteractionResult">
+    <transition event="DialogComponent.waitForInteraction.Return" target="waitForInteractionResult">
       <assign expr="_event.data.result" location="m_result"/>
       <assign expr="_event.data.interaction" location="m_interaction"/>
     </transition>

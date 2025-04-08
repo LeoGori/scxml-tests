@@ -18,4 +18,4 @@ target_link_libraries(${project-name} PRIVATE Qt6::Core Qt6::Scxml)
 
 target_sources(${project-name} PUBLIC main.cpp)
 
-qt6_add_statecharts(${project-name} MyStateMachine.scxml)
+qt6_add_statecharts(${project-name} DialogSkillAction.scxml)
