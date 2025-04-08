@@ -9,13 +9,13 @@ set(CMAKE_AUTOMOC ON)
 
 # set up our program
 
-add_executable(${project-name} MyDataModel.h )
+add_executable(${project-name})
 # declare our source files
 file(GLOB_RECURSE COMMON_SOURCE "*.h" "*.cpp")
 
 
 target_link_libraries(${project-name} PRIVATE Qt6::Core Qt6::Scxml)
 
-target_sources(${project-name} PUBLIC main.cpp MyDataModel.h MyDataModel.cpp)
+target_sources(${project-name} PUBLIC main.cpp)
 
 qt6_add_statecharts(${project-name} MyStateMachine.scxml)
