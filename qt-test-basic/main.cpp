@@ -3,40 +3,15 @@
 #include <QDebug>
 
 #include <iostream>
-// #include "MyDataModel.h"
 #include "build/DialogSkillAction.h"
 
 #include <thread>
 #include <chrono>
 
 void myFunction(DialogSkillAction *machine) {
-  QMetaObject::invokeMethod(machine, [machine]() {
-    machine->connectToEvent("DialogComponent.waitForInteraction.Call", [machine]([[maybe_unused]]const QScxmlEvent & event){
-      QVariantMap data;
-      data.insert("result", "SUCCESS");
-      data.insert("interaction", "Helloo mamacita");
-      data.insert("topic", "Am I in waitForInteractResult state?");
-      machine->submitEvent("DialogComponent.waitForInteraction.Return", data);     
-    });
+  int num_machine_states = 3;
 
-    machine->connectToEvent("SchedulerComponent.GetCurrentLanguage.Call", [machine]([[maybe_unused]]const QScxmlEvent & event){
-      QVariantMap data;
-      data.insert("result", "SUCCESS");
-      machine->submitEvent("SchedulerComponent.GetCurrentLanguage.Return", data);     
-    });
-
-    machine->connectToEvent("DialogComponent.checkDuplicate.Call", [machine]([[maybe_unused]]const QScxmlEvent & event){
-      QVariantMap data;
-      data.insert("result", "SUCCESS");
-      data.insert("language", "eng");
-      machine->submitEvent("DialogComponent.checkDuplicate.Return", data);     
-    });
-  }, Qt::QueuedConnection);
-
-  int count = 2;
-  int num_machine_states = 2;
-
-  for (int i = 0; i < count; ++i) {
+  for (int i = 0; i < num_machine_states; ++i) {
     std::cout << "Thread is running...\n";
     std::this_thread::sleep_for(std::chrono::milliseconds(3000));
 
@@ -49,46 +24,61 @@ void myFunction(DialogSkillAction *machine) {
       case 0:
         std::cout << "Case 0: CMD_TICK\n";
         eventName = "CMD_TICK";
-        data.insert("topic", "Am I in waitForInteract state?");
+        data.insert("topic", "miao");
         break;
       case 1:
         std::cout << "Case 1: DialogComponent.waitForInteraction.Call\n";
         eventName = "DialogComponent.waitForInteraction.Return";
-        data.insert("topic", "Am I in checkDuplicate state?");
+        data.insert("topic", "bau");
         break;
       default:
         std::cout << "Invalid case index: " << case_index << std::endl;
         continue;
     }
 
-    QMetaObject::invokeMethod(machine, [machine, eventName, data]() {
-      machine->submitEvent(eventName, data);
-    }, Qt::QueuedConnection);
+    machine->submitEvent(eventName, data);
   }
 
-  // Quit the app safely
   QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
 }
-
 
 int main(int argc, char *argv[])
 {
   QCoreApplication app(argc, argv);
-  // MyDataModel dataModel;
   DialogSkillAction stateMachine;
-  // stateMachine.setDataModel(&dataModel);
+
+  stateMachine.connectToEvent("DialogComponent.waitForInteraction.Call", [&](const QScxmlEvent &){
+    QVariantMap data;
+    data.insert("result", "SUCCESS");
+    data.insert("interaction", "Helloo mamacita");
+    data.insert("topic", "Am I in waitForInteractResult state?");
+    stateMachine.submitEvent("DialogComponent.waitForInteraction.Return", data);
+  });
+
+  stateMachine.connectToEvent("SchedulerComponent.GetCurrentLanguage.Call", [&](const QScxmlEvent &){
+    QVariantMap data;
+    data.insert("result", "SUCCESS");
+    data.insert("language", "eng");
+    stateMachine.submitEvent("SchedulerComponent.GetCurrentLanguage.Return", data);
+  });
+
+  stateMachine.connectToEvent("DialogComponent.checkDuplicate.Call", [&](const QScxmlEvent &){
+    QVariantMap data;
+    data.insert("result", "SUCCESS");
+    data.insert("isDuplicate", false);
+    stateMachine.submitEvent("DialogComponent.checkDuplicate.Return", data);
+  });
+
   stateMachine.start();
 
   if (!stateMachine.isInitialized()) {
     qWarning() << "State machine failed to initialize!";
+    return -1;
   }
 
   std::thread t1(myFunction, &stateMachine);
 
-  int ret=app.exec();
-
+  int ret = app.exec();
   t1.join();
-
   return ret;
-  
 }
