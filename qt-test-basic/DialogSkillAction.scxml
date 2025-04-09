@@ -18,8 +18,11 @@
   <state id="idle">
       <onentry>
         <script>
-          topic = eventData().value(QStringLiteral(&quot;topic&quot;)).toString();
-          qDebug() &lt;&lt; "entering idle" &lt;&lt; topic;
+          <!-- topic = eventData().value(QStringLiteral(&quot;topic&quot;)).toString();
+          qDebug() &lt;&lt; "entering idle" &lt;&lt; topic; -->
+          let topic = eventData().value("topic").toString();
+          console.log("entering idle", topic);
+          console.debug("entering idle", topic);
         </script>
       </onentry>
       <transition event="CMD_TICK" target="waitForInteraction" />
@@ -36,8 +39,11 @@
       </send>
 
       <script>
-        topic = eventData().value(QStringLiteral(&quot;topic&quot;)).toString();
-        qDebug() &lt;&lt; "entering waitForInteraction" &lt;&lt; topic;
+        <!-- topic = eventData().value(QStringLiteral(&quot;topic&quot;)).toString();
+        qDebug() &lt;&lt; "entering waitForInteraction" &lt;&lt; topic; -->
+        let topic = eventData().value("topic").toString();
+        console.log("entering waitForInteraction", topic);
+        console.debug("entering waitForInteraction", topic);
       </script>
     </onentry>
     <transition event="DialogComponent.waitForInteraction.Return" target="waitForInteractionResult">
@@ -206,7 +212,6 @@
     </onentry>
     <transition event="DialogComponent.interpret.Return" target="interpretResult">
       <assign expr="_event.data.result" location="m_result"/>
-      <assign expr="_event.data.reply" location="m_reply"/>
       <assign expr="_event.data.isQuestion" location="m_is_question"/>
     </transition>
   </state>
@@ -320,7 +325,8 @@
         qDebug() &lt;&lt; "entering checkIfDone" &lt;&lt; topic;
       </script>
     </onentry>
-    <transition cond="m_state == STATUS_DONE" target="sendSuccess" />
+    <!-- <transition cond="m_state == STATUS_DONE" target="sendSuccess" /> -->
+    <transition cond="m_state == 'STATUS_DONE'" target="sendSuccess" />
     <transition target="sendRunning"/>
   </state>
 
